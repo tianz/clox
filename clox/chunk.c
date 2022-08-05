@@ -14,7 +14,7 @@ void freeChunk(Chunk* chunk) {
     initChunk(chunk);
 }
 
-void writeToChunk(Chunk* chunk, uint8_t byte) {
+void writeChunk(Chunk* chunk, uint8_t byte) {
     if (chunk->capacity < chunk->count + 1) {
         int oldCapacity = chunk->capacity;
         chunk->capacity = GROW_CAPACITY(oldCapacity);
