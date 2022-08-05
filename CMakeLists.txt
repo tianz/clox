@@ -6,4 +6,5 @@ add_executable(clox
     clox/debug.c
     clox/main.c
     clox/memory.c
+    clox/value.c
 )
