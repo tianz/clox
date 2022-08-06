@@ -6,8 +6,16 @@
 
 typedef enum {
     OP_CONSTANT,
+
+    // arithmetic operators
     OP_NEGATE,
+    OP_ADD,
+    OP_SUBTRACT,
+    OP_MULTIPLY,
+    OP_DIVIDE,
+
     OP_RETURN,
+
 } OpCode;
 
 typedef struct {
