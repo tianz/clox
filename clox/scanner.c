@@ -243,7 +243,7 @@ static char advance(Scanner* scanner) {
 }
 
 static bool match(Scanner* scanner, char expected) {
-    if (isAtEnd(scanner) || scanner->current != expected) {
+    if (isAtEnd(scanner) || *scanner->current != expected) {
         return false;
     }
     scanner->current++;
@@ -251,7 +251,7 @@ static bool match(Scanner* scanner, char expected) {
 }
 
 static char peek(Scanner* scanner) {
-    return scanner->current;
+    return *scanner->current;
 }
 
 static char peekNext(Scanner* scanner) {
@@ -263,7 +263,7 @@ static char peekNext(Scanner* scanner) {
 }
 
 static bool isAtEnd(Scanner* scanner) {
-    return scanner->current == '\0';
+    return *scanner->current == '\0';
 }
 
 static bool isAlpha(char c) {

@@ -7,17 +7,18 @@
 #include "debug.h"
 #include "vm.h"
 
-static void repl();
-static void runFile(const char* path);
+static void repl(VM* vm);
+static void runFile(VM* vm, const char* path);
+static char* readFile(const char* path);
 
 int main(int argc, const char* argv[]) {
     VM vm;
     initVM(&vm);
 
     if (argc == 1) {
-        repl();
+        repl(&vm);
     } else if (argc == 2) {
-        runFile(argv[1]);
+        runFile(&vm, argv[1]);
     } else {
         fprintf(stderr, "Usage: clox [path]\n");
         exit(64);
@@ -27,7 +28,7 @@ int main(int argc, const char* argv[]) {
     return 0;
 }
 
-static void repl() {
+static void repl(VM* vm) {
     char line[1024];
     for (;;) {
         printf("> ");
@@ -37,13 +38,13 @@ static void repl() {
             break;
         }
 
-        interpret(line);
+        interpret(vm, line);
     }
 }
 
-static void runFile(const char* path) {
+static void runFile(VM* vm, const char* path) {
     char* source = readFile(path);
-    InterpretResult result = interpret(source);
+    InterpretResult result = interpret(vm, source);
     free(source);
 
     if (result == INTERPRET_COMPILE_ERROR) {
@@ -64,7 +65,7 @@ static char* readFile(const char* path) {
 
     // seek the file to find the size, then rewind
     fseek(file, 0L, SEEK_END);
-    size_t fileSize = fteel(file);
+    size_t fileSize = ftell(file);
     rewind(file);
 
     // allocate the buffer and read the file
