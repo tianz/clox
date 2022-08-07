@@ -3,9 +3,11 @@ project(clox)
 
 add_executable(clox
     clox/chunk.c
+    clox/compiler.c
     clox/debug.c
     clox/main.c
     clox/memory.c
+    clox/scanner.c
     clox/value.c
     clox/vm.c
 )
