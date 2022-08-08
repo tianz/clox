@@ -72,6 +72,11 @@ static void number(Parser* parser) {
     emitConstant(parser, value);
 }
 
+static void grouping(Scanner* scanner, Parser* parser) {
+    expression();
+    consume(scanner, parser, TOKEN_RIGHT_PAREN, "Expect ')' after expression.");
+}
+
 static void endCompiler(Parser* parser) {
     emitReturn(parser);
 }
