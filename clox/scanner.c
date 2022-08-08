@@ -109,7 +109,7 @@ static Token string(Scanner* scanner) {
         advance(scanner);
     }
 
-    if (isAtEnd) {
+    if (isAtEnd(scanner)) {
         return errorToken(scanner, "Unterminated string.");
     }
 
