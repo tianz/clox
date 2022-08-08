@@ -7,6 +7,8 @@
 typedef struct {
     Token current;
     Token previous;
+    bool hadError;
+    bool panicMode;
 } Parser;
 
 bool compile(const char* source, Chunk* chunk);
