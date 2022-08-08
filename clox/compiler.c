@@ -5,18 +5,32 @@
 #include "compiler.h"
 #include "scanner.h"
 
+static void advance(Scanner* scanner, Parser* parser);
+static void consume(Scanner* scanner, Parser* parser, TokenType type, const char* message);
+static void endCompiler(Parser* parser);
+static Chunk* currentChunk();
+static void emitByte(Parser* parser, uint8_t byte);
+static void emitReturn(Parser* parser);
+static void error(Parser* parser, const char* message);
+static void errorAtCurrent(Parser* parser, const char* message);
+static void errorAt(Parser* parser, Token* token, const char* message);
+
+Chunk* compilingChunk;
+
 bool compile(const char* source, Chunk* chunk) {
     Scanner scanner;
     Parser parser;
 
-    // initialize scanner and parser
+    // initialize scanner, chunk and parser
     initScanner(&scanner, source);
+    compilingChunk = chunk;
     parser.hadError = false;
     parser.panicMode = false;
 
     advance(&scanner, &parser);
     expression();
     consume(&scanner, &parser, TOKEN_EOF, "Expect end of expression.");
+    endCompiler(&parser);
 
     return !parser.hadError;
 }
@@ -43,6 +57,27 @@ static void consume(Scanner* scanner, Parser* parser, TokenType type, const char
     }
 
     errorAtCurrent(parser, message);
+}
+
+static void endCompiler(Parser* parser) {
+    emitReturn(parser);
+}
+
+static Chunk* currentChunk() {
+    return compilingChunk;
+}
+
+static void emitByte(Parser* parser, uint8_t byte) {
+    writeChunk(currentChunk(), byte, parser->previous.line);
+}
+
+static void emitBytes(Parser* parser, uint8_t byte1, uint8_t byte2) {
+    emitByte(parser, byte1);
+    emitByte(parser, byte2);
+}
+
+static void emitReturn(Parser* parser) {
+    emitByte(parser, OP_RETURN);
 }
 
 static void error(Parser* parser, const char* message) {
