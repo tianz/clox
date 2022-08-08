@@ -8,7 +8,9 @@
 static void advance(Scanner* scanner, Parser* parser);
 static void consume(Scanner* scanner, Parser* parser, TokenType type, const char* message);
 static void expression();
+static void grouping(Scanner* scanner, Parser* parser);
 static void number(Parser* parser);
+static void unary(Parser* parser);
 static void endCompiler(Parser* parser);
 static void emitReturn(Parser* parser);
 static void emitConstant(Parser* parser, Value value);
@@ -64,7 +66,13 @@ static void consume(Scanner* scanner, Parser* parser, TokenType type, const char
 }
 
 static void expression() {
+    // parse the lowest precedence level, which subsumes all of the higher-precedence expressions too
+    parsePrecedence(PREC_ASSIGNMENT);
+}
 
+static void grouping(Scanner* scanner, Parser* parser) {
+    expression();
+    consume(scanner, parser, TOKEN_RIGHT_PAREN, "Expect ')' after expression.");
 }
 
 static void number(Parser* parser) {
@@ -72,9 +80,25 @@ static void number(Parser* parser) {
     emitConstant(parser, value);
 }
 
-static void grouping(Scanner* scanner, Parser* parser) {
-    expression();
-    consume(scanner, parser, TOKEN_RIGHT_PAREN, "Expect ')' after expression.");
+static void unary(Parser* parser) {
+    TokenType operatorType = parser->previous.type;
+
+    // compile the operand
+    parsePrecedence(PREC_UNARY);
+
+    // emit the operator instruction
+    switch (operatorType) {
+        case TOKEN_MINUS:
+            emitByte(parser, OP_NEGATE);
+            break;
+        default:
+            // unreachable
+            return;
+    }
+}
+
+static void parsePrecedence(Precedence precedence) {
+
 }
 
 static void endCompiler(Parser* parser) {
