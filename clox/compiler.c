@@ -7,10 +7,14 @@
 
 static void advance(Scanner* scanner, Parser* parser);
 static void consume(Scanner* scanner, Parser* parser, TokenType type, const char* message);
+static void expression();
+static void number(Parser* parser);
 static void endCompiler(Parser* parser);
-static Chunk* currentChunk();
-static void emitByte(Parser* parser, uint8_t byte);
 static void emitReturn(Parser* parser);
+static void emitConstant(Parser* parser, Value value);
+static void emitByte(Parser* parser, uint8_t byte);
+static void emitBytes(Parser* parser, uint8_t byte1, uint8_t byte2);
+static Chunk* currentChunk();
 static void error(Parser* parser, const char* message);
 static void errorAtCurrent(Parser* parser, const char* message);
 static void errorAt(Parser* parser, Token* token, const char* message);
@@ -59,12 +63,36 @@ static void consume(Scanner* scanner, Parser* parser, TokenType type, const char
     errorAtCurrent(parser, message);
 }
 
+static void expression() {
+
+}
+
+static void number(Parser* parser) {
+    double value = strtod(parser->previous.start, NULL);
+    emitConstant(parser, value);
+}
+
 static void endCompiler(Parser* parser) {
     emitReturn(parser);
 }
 
-static Chunk* currentChunk() {
-    return compilingChunk;
+static void emitReturn(Parser* parser) {
+    emitByte(parser, OP_RETURN);
+}
+
+static void emitConstant(Parser* parser, Value value) {
+    emitBytes(parser, OP_CONSTANT, makeConstant(parser, value));
+}
+
+static uint8_t makeConstant(Parser* parser, Value value) {
+    int constant = addConstant(currentChunk(), value);
+
+    if (constant > UINT8_MAX) {
+        error(parser, "Too many constants in one chunk.");
+        return 0;
+    }
+
+    return (uint8_t)constant;
 }
 
 static void emitByte(Parser* parser, uint8_t byte) {
@@ -76,8 +104,8 @@ static void emitBytes(Parser* parser, uint8_t byte1, uint8_t byte2) {
     emitByte(parser, byte2);
 }
 
-static void emitReturn(Parser* parser) {
-    emitByte(parser, OP_RETURN);
+static Chunk* currentChunk() {
+    return compilingChunk;
 }
 
 static void error(Parser* parser, const char* message) {
