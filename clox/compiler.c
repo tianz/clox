@@ -9,8 +9,8 @@ static void advance(Scanner* scanner, Parser* parser);
 static void consume(Scanner* scanner, Parser* parser, TokenType type, const char* message);
 static void expression();
 static void grouping(Scanner* scanner, Parser* parser);
-static void number(Parser* parser);
 static void unary(Parser* parser);
+static void number(Parser* parser);
 static void endCompiler(Parser* parser);
 static void emitReturn(Parser* parser);
 static void emitConstant(Parser* parser, Value value);
@@ -75,9 +75,29 @@ static void grouping(Scanner* scanner, Parser* parser) {
     consume(scanner, parser, TOKEN_RIGHT_PAREN, "Expect ')' after expression.");
 }
 
-static void number(Parser* parser) {
-    double value = strtod(parser->previous.start, NULL);
-    emitConstant(parser, value);
+static void binary(Parser* parser) {
+    TokenType operatorType = parser->previous.type;
+    ParserRule* rule = getRule(operatorType);
+    // compile the right operand
+    parsePrecedence((Precedence)(rule->precedence + 1));
+
+    switch (operatorType) {
+        case TOKEN_PLUS:
+            emitByte(parser, OP_ADD);
+            break;
+        case TOKEN_MINUS:
+            emitByte(parser, OP_SUBTRACT);
+            break;
+        case TOKEN_STAR:
+            emitByte(parser, OP_MULTIPLY);
+            break;
+        case TOKEN_SLASH:
+            emitByte(parser, OP_DIVIDE);
+            break;
+        default:
+            // unreachable
+            return;
+    }
 }
 
 static void unary(Parser* parser) {
@@ -95,6 +115,11 @@ static void unary(Parser* parser) {
             // unreachable
             return;
     }
+}
+
+static void number(Parser* parser) {
+    double value = strtod(parser->previous.start, NULL);
+    emitConstant(parser, value);
 }
 
 static void parsePrecedence(Precedence precedence) {
