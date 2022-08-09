@@ -76,8 +76,6 @@ static InterpretResult run(VM* vm) {
             case OP_CONSTANT: {
                 Value constant = READ_CONSTANT();
                 push(vm, constant);
-                printValue(constant);
-                printf("\n");
                 break;
             }
             case OP_NEGATE:
