@@ -25,6 +25,14 @@ typedef enum {
     PREC_PRIMARY
 } Precedence;
 
+typedef void (*ParseFn)();
+
+typedef struct {
+    ParseFn prefix;
+    ParseFn infix;
+    Precedence precedence;
+} ParseRule;
+
 bool compile(const char* source, Chunk* chunk);
 
 #endif
