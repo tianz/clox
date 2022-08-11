@@ -10,12 +10,13 @@ typedef enum {
     OP_FALSE,
     OP_NIL,
 
-    // arithmetic operators
-    OP_NEGATE,
+    // operators
     OP_ADD,
-    OP_SUBTRACT,
-    OP_MULTIPLY,
     OP_DIVIDE,
+    OP_MULTIPLY,
+    OP_NEGATE,
+    OP_NOT,
+    OP_SUBTRACT,
 
     OP_RETURN,
 
