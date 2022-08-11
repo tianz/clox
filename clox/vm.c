@@ -85,6 +85,15 @@ static InterpretResult run(VM* vm) {
                 push(vm, constant);
                 break;
             }
+            case OP_TRUE:
+                push(vm, BOOL_VAL(true));
+                break;
+            case OP_FALSE:
+                push(vm, BOOL_VAL(false));
+                break;
+            case OP_NIL:
+                push(vm, NIL_VAL);
+                break;
             case OP_NEGATE:
                 if (!IS_NUMBER(peek(vm, 0))) {
                     runtimeError(vm, "Operand must be a number.");

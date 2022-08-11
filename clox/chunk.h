@@ -6,6 +6,9 @@
 
 typedef enum {
     OP_CONSTANT,
+    OP_TRUE,
+    OP_FALSE,
+    OP_NIL,
 
     // arithmetic operators
     OP_NEGATE,
