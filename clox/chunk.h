@@ -13,6 +13,9 @@ typedef enum {
     // operators
     OP_ADD,
     OP_DIVIDE,
+    OP_EQUAL,
+    OP_GREATER,
+    OP_LESS,
     OP_MULTIPLY,
     OP_NEGATE,
     OP_NOT,
