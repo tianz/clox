@@ -10,18 +10,21 @@
 #define ALLOCATE_OBJ(type, objectType) \
     (type*)allocateObject(sizeof(type), objectType);
 
-static ObjString* allocateString(char* chars, int length);
+static ObjString* allocateString(char* chars, int length, uint32_t hash);
 static Obj* allocateObject(size_t size, ObjType type);
+static uint32_t hashString(const char* key, int length);
 
 ObjString* copyString(const char* chars, int length) {
+    uint32_t hash = hashString(chars, length);
     char* heapChars = ALLOCATE(char, length + 1);
     memcpy(heapChars, chars, length);
     heapChars[length] = '\0';
-    return allocateString(heapChars, length);
+    return allocateString(heapChars, length, hash);
 }
 
 ObjString* takeString(char* chars, int length) {
-    return allocateString(chars, length);
+    uint32_t hash = hashString(chars, length);
+    return allocateString(chars, length, hash);
 }
 
 void printObject(Value value) {
@@ -32,10 +35,11 @@ void printObject(Value value) {
     }
 }
 
-static ObjString* allocateString(char* chars, int length) {
+static ObjString* allocateString(char* chars, int length, uint32_t hash) {
     ObjString* string = ALLOCATE_OBJ(ObjString, OBJ_STRING);
     string->chars = chars;
     string->length = length;
+    string->hash = hash;
     return string;
 }
 
@@ -46,4 +50,14 @@ static Obj* allocateObject(size_t size, ObjType type) {
     vm.objects = object; // reset head
 
     return object;
+}
+
+// FNV-1a hash function
+static uint32_t hashString(const char* key, int length) {
+    uint32_t hash = 2166136261u;
+    for (int i = 0; i < length; i++) {
+        hash ^= (uint8_t)key[i];
+        hash *= 16777619;
+    }
+    return hash;
 }
