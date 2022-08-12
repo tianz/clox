@@ -18,6 +18,7 @@
 #define AS_OBJ(value) ((value).as.obj)
 
 typedef struct Obj Obj;
+typedef struct ObjString ObjString;
 
 typedef enum {
     VAL_BOOL,

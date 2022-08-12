@@ -3,6 +3,10 @@
 
 #include "common.h"
 
+// allocates an array with a given element type and count; returns the pointer
+#define ALLOCATE(type, count) \
+    (type*)reallocate(NULL, 0, sizeof(type) * (count))
+
 #define GROW_CAPACITY(capacity) \
     ((capacity) < 8 ? 8 : (capacity) * 2)
 
