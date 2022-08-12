@@ -20,6 +20,18 @@ ObjString* copyString(const char* chars, int length) {
     return allocateString(heapChars, length);
 }
 
+ObjString* takeString(char* chars, int length) {
+    return allocateString(chars, length);
+}
+
+void printObject(Value value) {
+    switch (OBJ_TYPE(value)) {
+        case OBJ_STRING:
+            printf("%s", AS_CSTRING(value));
+            break;
+    }
+}
+
 static ObjString* allocateString(char* chars, int length) {
     ObjString* string = ALLOCATE_OBJ(ObjString, OBJ_STRING);
     string->chars = chars;
