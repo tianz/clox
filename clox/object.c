@@ -42,5 +42,8 @@ static ObjString* allocateString(char* chars, int length) {
 static Obj* allocateObject(size_t size, ObjType type) {
     Obj* object = (Obj*)reallocate(NULL, 0, size);
     object->type = type;
+    object->next = vm.objects; // insert at the head of the list
+    vm.objects = object; // reset head
+
     return object;
 }

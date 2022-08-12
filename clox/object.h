@@ -16,6 +16,7 @@ typedef enum {
 
 struct Obj {
     ObjType type;
+    struct Obj* next; // make objects a linked list
 };
 
 struct ObjString {
