@@ -2,16 +2,17 @@
 #define clox_vm_h
 
 #include "chunk.h"
+#include "table.h"
 #include "value.h"
 
 #define STACK_MAX 256
 
 typedef struct {
     Chunk* chunk;
-    // instruction pointer or program counter (PC)
-    uint8_t* ip;
+    uint8_t* ip; // instruction pointer or program counter (PC)
     Value stack[STACK_MAX];
     Value* stackTop;
+    Table strings; // string interning
     Obj* objects; // head to the objects linked list
 } VM;
 
