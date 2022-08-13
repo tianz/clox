@@ -149,6 +149,9 @@ static InterpretResult run() {
             case OP_SUBTRACT:
                 BINARY_OP(NUMBER_VAL, -);
                 break;
+            case OP_POP:
+                pop();
+                break;
             case OP_PRINT:
                 printValue(pop());
                 printf("\n");

@@ -16,6 +16,7 @@ static bool check(TokenType type);
 static void declaration();
 static void statement();
 static void printStatement();
+static void expressionStatemet();
 static void expression();
 static void grouping();
 static void binary();
@@ -144,6 +145,8 @@ static void declaration() {
 static void statement() {
     if (match(TOKEN_PRINT)) {
         printStatement();
+    } else {
+        expressionStatement();
     }
 }
 
@@ -151,6 +154,12 @@ static void printStatement() {
     expression();
     consume(TOKEN_SEMICOLON, "Expect ';' after value.");
     emitByte(OP_PRINT);
+}
+
+static void expressionStatemet() {
+    expression();
+    consume(TOKEN_SEMICOLON, "Expect ';' after expression.");
+    emitByte(OP_POP);
 }
 
 static void expression() {
