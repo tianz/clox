@@ -155,6 +155,7 @@ static InterpretResult run() {
             case OP_DEFINE_GLOBAL: {
                 ObjString* name = READ_STRING();
                 tableSet(&vm.globals, name, peek(0));
+                pop(); // the value is popped after it is used.
                 break;
             }
             case OP_GET_GLOBAL: {
@@ -177,6 +178,16 @@ static InterpretResult run() {
             case OP_RETURN:
                 // exit interpreter
                 return INTERPRET_OK;
+            case OP_SET_GLOBAL: {
+                ObjString* name = READ_STRING();
+                if (tableSet(&vm.globals, name, peek(0))) {
+                    tableDelete(&vm.globals, name);
+                    runtimeError("Undefined variable '%s'.", name->chars);
+                    return INTERPRET_RUNTIME_ERROR;
+                }
+                // the value is not popped because assignment is an expression
+                break;
+            }
         }
     }
 
