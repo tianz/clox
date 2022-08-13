@@ -25,6 +25,8 @@ static void expression();
 static void grouping();
 static void binary();
 static void unary();
+static void variable();
+static void namedVariable(Token name);
 static void number();
 static void literal();
 static void string();
@@ -66,7 +68,7 @@ ParseRule rules[] = {
     [TOKEN_GREATER_EQUAL] = { NULL, binary, PREC_COMPARISON},
     [TOKEN_LESS] = { NULL, binary, PREC_COMPARISON},
     [TOKEN_LESS_EQUAL] = { NULL, binary, PREC_COMPARISON},
-    [TOKEN_IDENTIFIER] = { NULL, NULL, PREC_NONE},
+    [TOKEN_IDENTIFIER] = { variable, NULL, PREC_NONE},
     [TOKEN_STRING] = { string, NULL, PREC_NONE},
     [TOKEN_NUMBER] = { number, NULL, PREC_NONE},
     [TOKEN_AND] = { NULL, NULL, PREC_NONE},
@@ -169,6 +171,7 @@ static uint8_t parseVariable(const char* errorMessage) {
     return identifierConstant(&parser.previous);
 }
 
+// Returns the index where the identifier constant is added.
 static uint8_t identifierConstant(Token* name) {
     return makeConstant(OBJ_VAL(copyString(name->start, name->length)));
 }
@@ -274,6 +277,15 @@ static void unary() {
     }
 }
 
+static void variable() {
+    namedVariable(parser.previous);
+}
+
+static void namedVariable(Token name) {
+    uint8_t arg = identifierConstant(&name);
+    emitBytes(OP_GET_GLOBAL, arg);
+}
+
 static void number() {
     double value = strtod(parser.previous.start, NULL);
     emitConstant(NUMBER_VAL(value));
@@ -342,6 +354,7 @@ static void emitConstant(Value value) {
     emitBytes(OP_CONSTANT, makeConstant(value));
 }
 
+// Returns the index where the value is added.
 static uint8_t makeConstant(Value value) {
     int constant = addConstant(currentChunk(), value);
 
