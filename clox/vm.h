@@ -12,6 +12,7 @@ typedef struct {
     uint8_t* ip; // instruction pointer or program counter (PC)
     Value stack[STACK_MAX];
     Value* stackTop;
+    Table globals; // global variables
     Table strings; // string interning
     Obj* objects; // head to the objects linked list
 } VM;
