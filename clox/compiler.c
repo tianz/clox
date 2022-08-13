@@ -11,6 +11,11 @@
 
 static void advance();
 static void consume(TokenType type, const char* message);
+static bool match(TokenType type);
+static bool check(TokenType type);
+static void declaration();
+static void statement();
+static void printStatement();
 static void expression();
 static void grouping();
 static void binary();
@@ -86,8 +91,11 @@ bool compile(const char* source, Chunk* chunk) {
     parser.panicMode = false;
 
     advance();
-    expression();
-    consume(TOKEN_EOF, "Expect end of expression.");
+
+    while (!match(TOKEN_EOF)) {
+        declaration();
+    }
+
     endCompiler();
 
     return !parser.hadError;
@@ -115,6 +123,34 @@ static void consume(TokenType type, const char* message) {
     }
 
     errorAtCurrent(message);
+}
+
+static bool match(TokenType type) {
+    if (!check(type)) {
+        return false;
+    }
+    advance();
+    return true;
+}
+
+static bool check(TokenType type) {
+    return parser.current.type == type;
+}
+
+static void declaration() {
+    statement();
+}
+
+static void statement() {
+    if (match(TOKEN_PRINT)) {
+        printStatement();
+    }
+}
+
+static void printStatement() {
+    expression();
+    consume(TOKEN_SEMICOLON, "Expect ';' after value.");
+    emitByte(OP_PRINT);
 }
 
 static void expression() {
