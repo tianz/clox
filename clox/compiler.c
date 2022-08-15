@@ -9,6 +9,7 @@
 #include "debug.h"
 #endif
 
+static void initCompiler(Compiler* compiler);
 static void advance();
 static void consume(TokenType type, const char* message);
 static bool match(TokenType type);
@@ -46,6 +47,7 @@ static void synchronize();
 
 Scanner scanner;
 Parser parser;
+Compiler* current = NULL;
 Chunk* compilingChunk;
 
 ParseRule rules[] = {
@@ -92,7 +94,9 @@ ParseRule rules[] = {
 };
 
 bool compile(const char* source, Chunk* chunk) {
-    // initialize scanner, chunk and parser
+    // initialize compiler, scanner, chunk and parser
+    Compiler compiler;
+    initCompiler(&compiler);
     initScanner(&scanner, source);
     compilingChunk = chunk;
     parser.hadError = false;
@@ -107,6 +111,12 @@ bool compile(const char* source, Chunk* chunk) {
     endCompiler();
 
     return !parser.hadError;
+}
+
+static void initCompiler(Compiler* compiler) {
+    compiler->localCount = 0;
+    compiler->scopeDepth = 0;
+    current = compiler;
 }
 
 static void advance() {
