@@ -20,8 +20,11 @@ static uint8_t parseVariable(const char* errorMessage);
 static uint8_t identifierConstant(Token* name);
 static void defineVariable(uint8_t global);
 static void statement();
+static void beginScope();
+static void endScope();
 static void printStatement();
 static void expressionStatement();
+static void block();
 static void expression();
 static void grouping(bool canAssign);
 static void binary(bool canAssign);
@@ -193,9 +196,21 @@ static void defineVariable(uint8_t global) {
 static void statement() {
     if (match(TOKEN_PRINT)) {
         printStatement();
+    } else if (match(TOKEN_LEFT_BRACE)) {
+        beginScope();
+        block();
+        endScope();
     } else {
         expressionStatement();
     }
+}
+
+static void beginScope() {
+    current->scopeDepth++;
+}
+
+static void endScope() {
+    current->scopeDepth--;
 }
 
 static void printStatement() {
@@ -208,6 +223,14 @@ static void expressionStatement() {
     expression();
     consume(TOKEN_SEMICOLON, "Expect ';' after expression.");
     emitByte(OP_POP);
+}
+
+static void block() {
+    while (!check(TOKEN_RIGHT_BRACE) && !check(TOKEN_EOF)) {
+        declaration();
+    }
+
+    consume(TOKEN_RIGHT_BRACE, "Expect '}' after block.");
 }
 
 static void expression() {
